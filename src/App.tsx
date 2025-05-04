@@ -6,12 +6,19 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import { useEffect } from "react";
+import { initializeApiKeys } from "./lib/api-keys";
 
 const queryClient = new QueryClient();
 
 const App = () => {
   // Update the document title
   document.title = "TimePod - AI Character Podcasts";
+  
+  // Initialize API keys
+  useEffect(() => {
+    initializeApiKeys();
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>

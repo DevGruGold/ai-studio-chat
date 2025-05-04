@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Mic, Play, Pause, Speaker, SkipForward, SkipBack } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
+import { useAudioPlayer } from "@/hooks/use-audio-player";
+import AudioVisualizer from "@/components/AudioVisualizer";
+import { initializeApiKeys } from "@/lib/api-keys";
 
 interface PodcastStudioProps {
   characters: Character[];
@@ -26,7 +29,11 @@ const PodcastStudio: React.FC<PodcastStudioProps> = ({
   });
 
   const [messages, setMessages] = useState<Message[]>([]);
-  const [currentSpeaker, setCurrentSpeaker] = useState<string | null>(null);
+  
+  // Initialize API keys
+  useEffect(() => {
+    initializeApiKeys();
+  }, []);
   
   // Generate placeholder messages
   useEffect(() => {
@@ -51,6 +58,19 @@ const PodcastStudio: React.FC<PodcastStudioProps> = ({
     setMessages(sampleMessages);
   }, [characters, topic]);
   
+  // Use our custom hook for audio playback
+  const {
+    currentSpeaker,
+    currentMessage,
+    audioElement,
+    isAudioPlaying
+  } = useAudioPlayer({
+    messages,
+    characters,
+    currentTime: podcastState.currentTime,
+    isPlaying: podcastState.isPlaying
+  });
+  
   // Simulated playback
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
@@ -68,25 +88,11 @@ const PodcastStudio: React.FC<PodcastStudioProps> = ({
           
           return { ...prev, currentTime: newTime };
         });
-        
-        // Determine who should be speaking
-        const currentTimeSeconds = podcastState.currentTime;
-        const speakingMessage = messages.find(
-          (msg) => 
-            Math.abs(msg.timestamp - currentTimeSeconds) < 10
-        );
-        
-        if (speakingMessage) {
-          setCurrentSpeaker(speakingMessage.characterId);
-        } else {
-          setCurrentSpeaker(null);
-        }
-        
       }, 1000);
     }
     
     return () => clearInterval(interval);
-  }, [podcastState.isPlaying, messages]);
+  }, [podcastState.isPlaying]);
 
   const togglePlayback = () => {
     if (!podcastState.isPlaying && podcastState.currentTime >= podcastState.duration) {
@@ -97,8 +103,8 @@ const PodcastStudio: React.FC<PodcastStudioProps> = ({
     }
     
     if (!podcastState.isPlaying) {
-      toast("Starting podcast simulation", {
-        description: "This is a simulation using placeholder content"
+      toast("Starting podcast with real voices", {
+        description: "Audio will play using ElevenLabs text-to-speech"
       });
     }
   };
@@ -112,18 +118,17 @@ const PodcastStudio: React.FC<PodcastStudioProps> = ({
   const handleSeek = (value: number[]) => {
     setPodcastState({ ...podcastState, currentTime: value[0] });
   };
-  
-  // Find current message based on timestamp
-  const currentMessage = messages.find(
-    (msg) => Math.abs(msg.timestamp - podcastState.currentTime) < 10
-  );
 
   return (
     <div className="flex flex-col h-full">
       <div className="bg-podcast-wood p-3 rounded-t-lg">
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-bold text-white">TimePod Studio</h2>
-          <div className="podcast-studio-light w-3 h-3 rounded-full bg-podcast-accent"></div>
+          <div 
+            className={`podcast-studio-light w-3 h-3 rounded-full ${
+              podcastState.isPlaying ? "bg-red-500 animate-pulse" : "bg-podcast-accent"
+            }`}
+          ></div>
         </div>
       </div>
       
@@ -131,32 +136,48 @@ const PodcastStudio: React.FC<PodcastStudioProps> = ({
         {/* Studio setup with characters */}
         <div className="flex-1 flex flex-col md:flex-row gap-6 items-center justify-center p-4 border-2 border-gray-800 rounded-lg bg-gray-900/50">
           <div className="flex gap-4 md:gap-10 items-center">
-            {characters.map((character) => (
-              <div key={character.id} className="flex flex-col items-center gap-2">
-                <CharacterAvatar 
-                  character={character} 
-                  size="xl" 
-                  isTalking={currentSpeaker === character.id}
-                />
-                <div className="text-center">
-                  <p className="font-medium text-sm">{character.name}</p>
-                  <div 
-                    className="w-2 h-2 rounded-full mx-auto mt-1"
-                    style={{ 
-                      backgroundColor: currentSpeaker === character.id ? character.color : 'transparent',
-                      boxShadow: currentSpeaker === character.id ? `0 0 8px ${character.color}` : 'none'
-                    }}
-                  ></div>
+            {characters.map((character) => {
+              const isTalking = currentSpeaker === character.id;
+              
+              return (
+                <div key={character.id} className="flex flex-col items-center gap-2">
+                  <CharacterAvatar 
+                    character={character} 
+                    size="xl" 
+                    isTalking={isTalking} 
+                  />
+                  <div className="text-center">
+                    <p className="font-medium text-sm">{character.name}</p>
+                    {isTalking && audioElement && (
+                      <div className="mt-1">
+                        <AudioVisualizer 
+                          audioElement={audioElement}
+                          color={character.color}
+                          height={20}
+                          width={60}
+                          isPlaying={isAudioPlaying}
+                        />
+                      </div>
+                    )}
+                    {!isTalking && (
+                      <div 
+                        className="w-2 h-2 rounded-full mx-auto mt-1"
+                        style={{ 
+                          backgroundColor: 'transparent'
+                        }}
+                      ></div>
+                    )}
+                  </div>
+                  <div className="microphone-stand w-1 h-10 rounded-full mx-auto"></div>
+                  <Mic
+                    size={20}
+                    className={`${
+                      isTalking ? "text-podcast-accent animate-pulse" : "text-gray-600"
+                    }`}
+                  />
                 </div>
-                <div className="microphone-stand w-1 h-10 rounded-full mx-auto"></div>
-                <Mic
-                  size={20}
-                  className={`${
-                    currentSpeaker === character.id ? "text-podcast-accent animate-pulse" : "text-gray-600"
-                  }`}
-                />
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
         

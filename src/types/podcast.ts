@@ -39,3 +39,11 @@ export type PodcastState = {
   duration: number;
   activeCharacters: string[];
 };
+
+export type AudioVisualizerProps = {
+  audioElement: HTMLAudioElement | null;
+  color: string;
+  height?: number;
+  width?: number;
+  isPlaying: boolean;
+};
