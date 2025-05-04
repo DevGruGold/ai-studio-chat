@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -96,6 +97,25 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-podcast-studio text-podcast-text;
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+@layer components {
+  .podcast-wood {
+    background: linear-gradient(to bottom, #8B4513, #A0522D);
+  }
+  
+  .podcast-studio-light {
+    box-shadow: 0 0 15px 5px rgba(255, 87, 34, 0.3);
+  }
+  
+  .microphone-stand {
+    background: linear-gradient(90deg, #2C2C2C 0%, #4A4A4A 50%, #2C2C2C 100%);
+  }
+  
+  .character-talking {
+    animation: talking 0.3s ease-in-out infinite;
   }
 }
