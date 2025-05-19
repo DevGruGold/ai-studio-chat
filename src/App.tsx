@@ -8,8 +8,16 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import { useEffect } from "react";
 import { initializeApiKeys } from "./lib/api-keys";
+import "./App.css";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: false,
+    },
+  },
+});
 
 const App = () => {
   // Update the document title
@@ -18,19 +26,27 @@ const App = () => {
   // Initialize API keys
   useEffect(() => {
     initializeApiKeys();
+    
+    // Add viewport meta tag for better mobile experience
+    const meta = document.createElement('meta');
+    meta.name = 'viewport';
+    meta.content = 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0';
+    document.getElementsByTagName('head')[0].appendChild(meta);
   }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
-        <Sonner />
+        <Sonner position="top-center" expand={true} closeButton={true} />
         <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <div className="min-h-screen bg-gradient-to-b from-white to-purple-50">
+            <Routes>
+              <Route path="/" element={<Index />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </div>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>

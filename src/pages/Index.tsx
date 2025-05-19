@@ -8,12 +8,14 @@ import CharacterSelector from "@/components/CharacterSelector";
 import TopicSelector from "@/components/TopicSelector";
 import PodcastStudio from "@/components/PodcastStudio";
 import { toast } from "@/components/ui/sonner";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Index = () => {
   const [selectedCharacters, setSelectedCharacters] = useState<Character[]>([]);
   const [selectedTopic, setSelectedTopic] = useState<Topic | null>(null);
   const [setupComplete, setSetupComplete] = useState(false);
   const [activeTab, setActiveTab] = useState("characters");
+  const isMobile = useIsMobile();
 
   const handleCharacterSelect = (character: Character) => {
     if (selectedCharacters.find(c => c.id === character.id)) {
@@ -51,38 +53,40 @@ const Index = () => {
 
   if (setupComplete) {
     return (
-      <div className="min-h-screen max-w-5xl mx-auto py-6 px-4">
-        <PodcastStudio 
-          characters={selectedCharacters} 
-          topic={selectedTopic!} 
-          onBackToSetup={handleBackToSetup} 
-        />
+      <div className="min-h-screen p-0 sm:p-4 md:py-6 md:px-4">
+        <div className="max-w-5xl mx-auto h-[calc(100vh-2rem)] sm:h-auto">
+          <PodcastStudio 
+            characters={selectedCharacters} 
+            topic={selectedTopic!} 
+            onBackToSetup={handleBackToSetup} 
+          />
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen py-6 px-4">
-      <div className="max-w-4xl mx-auto text-center mb-8">
-        <h1 className="text-4xl font-bold mb-2 text-podcast-accent">TimePod</h1>
-        <p className="text-xl">
+    <div className="min-h-screen py-4 px-4 sm:py-6 bg-gradient-to-b from-white to-purple-50 fade-in">
+      <div className="max-w-4xl mx-auto text-center mb-6 sm:mb-8">
+        <h1 className="text-3xl sm:text-4xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600">TimePod</h1>
+        <p className="text-lg sm:text-xl text-gray-700">
           AI-powered historical, political, religious, and fictional characters in podcast conversations
         </p>
       </div>
 
-      <Card className="max-w-3xl mx-auto bg-podcast-studio border-podcast-accent/40">
-        <CardHeader>
-          <CardTitle className="text-podcast-text text-2xl">Create Your Podcast</CardTitle>
+      <Card className="max-w-3xl mx-auto bg-white border-gray-200 shadow-md">
+        <CardHeader className="border-b border-gray-100">
+          <CardTitle className="text-2xl text-gray-800">Create Your Podcast</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-3 sm:p-6">
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-2 mb-2">
               <TabsTrigger value="characters">1. Select Characters</TabsTrigger>
               <TabsTrigger value="topic" disabled={selectedCharacters.length < 2}>
                 2. Choose Topic
               </TabsTrigger>
             </TabsList>
-            <TabsContent value="characters">
+            <TabsContent value="characters" className="mt-2 sm:mt-4">
               <CharacterSelector
                 selectedCharacters={selectedCharacters}
                 onSelectCharacter={handleCharacterSelect}
@@ -99,12 +103,13 @@ const Index = () => {
                     setActiveTab("topic");
                   }}
                   disabled={selectedCharacters.length < 2}
+                  className="bg-purple-600 hover:bg-purple-700"
                 >
                   Continue to Topic Selection
                 </Button>
               </div>
             </TabsContent>
-            <TabsContent value="topic">
+            <TabsContent value="topic" className="mt-2 sm:mt-4">
               <TopicSelector
                 selectedTopic={selectedTopic}
                 onSelectTopic={handleTopicSelect}
@@ -112,7 +117,7 @@ const Index = () => {
             </TabsContent>
           </Tabs>
         </CardContent>
-        <CardFooter className="flex justify-between">
+        <CardFooter className="flex justify-between border-t border-gray-100 p-3 sm:p-6">
           {activeTab === "topic" && (
             <Button variant="outline" onClick={() => setActiveTab("characters")}>
               Back to Characters
@@ -122,7 +127,7 @@ const Index = () => {
             <Button
               onClick={handleStartPodcast}
               disabled={selectedCharacters.length < 2 || !selectedTopic}
-              className={activeTab === "topic" ? "" : "hidden"}
+              className={`bg-purple-600 hover:bg-purple-700 ${activeTab === "topic" ? "" : "hidden"}`}
             >
               Start Podcast
             </Button>
@@ -130,11 +135,11 @@ const Index = () => {
         </CardFooter>
       </Card>
 
-      <div className="max-w-3xl mx-auto mt-8 text-center">
-        <p className="text-sm text-gray-400">
+      <div className="max-w-3xl mx-auto mt-6 sm:mt-8 text-center">
+        <p className="text-sm text-gray-500">
           Note: This is a simulation. Integration with real AI-generated conversations coming soon!
         </p>
-        <p className="text-sm text-gray-400 mt-2">
+        <p className="text-sm text-gray-500 mt-2">
           You'll be able to use your own AI API keys to generate real conversations between these characters.
         </p>
       </div>

@@ -36,20 +36,19 @@
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    --podcast-studio: 240 10% 15%;
+    --podcast-accent: 259 76% 65%;
+    --podcast-accent-light: 259 76% 85%;
+    --podcast-text: 0 0% 98%;
+    --podcast-wood: 20 70% 40%;
   }
 
   .dark {
@@ -97,8 +96,8 @@
   }
 
   body {
-    @apply bg-podcast-studio text-podcast-text;
-    font-family: 'Inter', sans-serif;
+    @apply bg-white text-gray-800;
+    font-family: 'Inter', system-ui, sans-serif;
   }
 }
 
@@ -118,4 +117,57 @@
   .character-talking {
     animation: talking 0.3s ease-in-out infinite;
   }
+
+  .card-gradient {
+    @apply bg-gradient-to-br from-white to-purple-50;
+  }
+
+  /* Mobile optimized container */
+  .mobile-container {
+    @apply px-4 sm:px-6 md:px-8 max-w-7xl mx-auto w-full;
+  }
+
+  /* Responsive paddings */
+  .responsive-p {
+    @apply p-3 sm:p-4 md:p-6;
+  }
+
+  /* Responsive margins */
+  .responsive-m {
+    @apply m-2 sm:m-3 md:m-4;
+  }
+
+  /* Podcast studio card */
+  .podcast-card {
+    @apply rounded-xl bg-white shadow-md border border-gray-100;
+  }
+}
+
+/* Responsive animations */
+@keyframes talking {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Fade in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
 }
